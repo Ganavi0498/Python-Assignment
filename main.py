@@ -22,27 +22,23 @@ def main():
     selections, max_devs = selector.select()
 
     # 4) Map test data
-    mapper = TestMapper(test_df, ideal_df, selections, max_devs)
-    test_map_df = mapper.map()
+    raw_map_df = TestMapper(test_df, ideal_df, selections, max_devs).map()
 
-    # ———> Insert renaming here to match your assignment schema:
-    test_map_df = test_map_df.rename(columns={
+    # 4a) Persist renamed output table
+    persist_df = raw_map_df.rename(columns={
         "x":          "X (test func)",
         "y":          "Y (test func)",
         "delta_y":    "Delta Y (test func)",
         "ideal_func": "No. of ideal func"
     })
+    db.to_sql(persist_df, "test_mapping", if_exists="replace")
+    persist_df.to_csv("test_mapping.csv", index=False)
 
-    # 4b) Persist the renamed output table
-    db.to_sql(test_map_df, "test_mapping", if_exists="replace")
-
-    # (Optional) export to CSV for inspection
-    test_map_df.to_csv("test_mapping.csv", index=False)
-
-    # 5) Visualize
+    # 5) Visualize: separate plots for Train, Ideal, and Test
     viz = Visualizer(train_df, ideal_df, selections)
-    viz.plot_training()
-    viz.plot_test_mapping(test_map_df)
+    viz.plot_train_curves("train_curves.html")
+    viz.plot_ideal_curves("ideal_curves.html")
+    viz.plot_test_mapping(raw_map_df,  "test_mapping.html")
 
 if __name__ == "__main__":
     main()
