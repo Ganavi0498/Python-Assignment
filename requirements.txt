@@ -1,0 +1,16 @@
+# Data handling and computation
+pandas
+numpy
+
+# Database
+SQLAlchemy
+
+# Visualization
+bokeh
+
+# Testing
+pytest
+pytest-cov
+
+# Linting
+flake8
